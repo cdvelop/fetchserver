@@ -2,7 +2,6 @@ package fetchserver
 
 import "github.com/cdvelop/model"
 
-type httpServer struct {
+type fetchServer struct {
 	model.DataConverter
-	server_url string
 }

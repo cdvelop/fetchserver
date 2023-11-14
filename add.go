@@ -2,13 +2,18 @@ package fetchserver
 
 import "github.com/cdvelop/model"
 
-func AddFetchAdapter(h *model.Handlers, server_url string) (*httpServer, error) {
+func AddFetchAdapter(h *model.Handlers) error {
+	const e = "error fetchserver nil"
 
-	n := httpServer{
+	if h.DataConverter == nil {
+		return model.Error(e, "DataConverter")
+	}
+
+	n := fetchServer{
 		DataConverter: h,
 	}
 
-	h.FetchAdapter = &n
+	h.FetchAdapter = n
 
-	return &n, nil
+	return nil
 }

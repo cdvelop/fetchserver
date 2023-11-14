@@ -6,18 +6,16 @@ import (
 	"net/http"
 )
 
-// action ej: "create","update","delete","upload" = "POST",  "file" and "read" == GET
-// object ej: patientcare.printdoc
-func (h *httpServer) SendOneRequest(action, object string, body_rq any, response func([]map[string]string, error)) {
-	var method = "GET"
-	switch action {
-	case "create", "update", "delete", "upload":
-		method = "POST"
+func (h fetchServer) SendOneRequest(method, endpoint, object string, body_rq any, response func([]map[string]string, error)) {
+
+	var back string
+	if object != "" {
+		back = "/"
 	}
 
-	endpoint := action + "/" + object
+	endpoint = endpoint + back + object
 
-	req, err := http.NewRequest(method, h.server_url+endpoint, nil)
+	req, err := http.NewRequest(method, endpoint, nil)
 	if err != nil {
 		response(nil, err)
 		return
@@ -27,12 +25,11 @@ func (h *httpServer) SendOneRequest(action, object string, body_rq any, response
 
 	var body []byte
 
-	if body_form, ok := body_rq.([]byte); !ok {
+	if body_form, ok := body_rq.([]byte); ok {
 		body = body_form
 		content_type = "multipart/form-data"
 	} else {
-
-		body, err = h.EncodeMaps(body_rq)
+		body, err = h.EncodeMaps(body_rq, object)
 		if err != nil {
 			response(nil, err)
 			return
