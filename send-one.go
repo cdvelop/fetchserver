@@ -5,16 +5,15 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/cdvelop/model"
 	"github.com/cdvelop/strings"
 )
 
-func (h fetchServer) SendOneRequest(method, endpoint, object string, body_rq any, response func([]map[string]string, error)) {
+func (h fetchServer) SendOneRequest(method, endpoint, object string, body_rq any, response func(result []map[string]string, err string)) {
 
 	switch method {
 	case "GET", "POST":
 	default:
-		response(nil, model.Error("Método", method, "no soportado"))
+		response(nil, "Método "+method+" no soportado")
 		return
 	}
 
@@ -30,15 +29,15 @@ func (h fetchServer) SendOneRequest(method, endpoint, object string, body_rq any
 
 	endpoint = endpoint + back
 
-	req, err := http.NewRequest(method, endpoint, nil)
-	if err != nil {
-		response(nil, err)
+	req, e := http.NewRequest(method, endpoint, nil)
+	if e != nil {
+		response(nil, e.Error())
 		return
 	}
 
 	if body_rq != nil {
 		var content_type = "application/json"
-
+		var err string
 		var body []byte
 
 		// Content-Type multipart/form-data
@@ -52,7 +51,7 @@ func (h fetchServer) SendOneRequest(method, endpoint, object string, body_rq any
 
 		} else {
 			body, err = h.EncodeMaps(body_rq, object)
-			if err != nil {
+			if err != "" {
 				response(nil, err)
 				return
 			}
@@ -66,9 +65,9 @@ func (h fetchServer) SendOneRequest(method, endpoint, object string, body_rq any
 	}
 
 	client := &http.Client{}
-	res, err := client.Do(req)
-	if err != nil {
-		response(nil, err)
+	res, e := client.Do(req)
+	if e != nil {
+		response(nil, e.Error())
 		return
 	}
 	defer res.Body.Close()
@@ -80,29 +79,29 @@ func (h fetchServer) SendOneRequest(method, endpoint, object string, body_rq any
 	status := res.Header.Get("Status")
 
 	if res.StatusCode != 200 {
-		response(nil, model.Error(status))
+		response(nil, status)
 		return
 	}
 
-	resp, err := io.ReadAll(res.Body)
-	if err != nil {
-		response(nil, err)
+	resp, e := io.ReadAll(res.Body)
+	if e != nil {
+		response(nil, e.Error())
 		return
 	}
 
 	// fmt.Println("BODY NIL:", resp)
 	if file_content {
 		// retornamos el fichero
-		response([]map[string]string{{"file": string(resp)}}, nil)
+		response([]map[string]string{{"file": string(resp)}}, "")
 	} else {
 
 		out, err := h.DecodeMaps(resp, object)
-		if err != nil {
+		if err != "" {
 			response(nil, err)
 			return
 		}
 
-		response(out, nil)
+		response(out, "")
 
 	}
 
