@@ -50,7 +50,7 @@ func (h fetchServer) SendOneRequest(method, endpoint, object string, body_rq any
 			}
 
 		} else {
-			body, err = h.EncodeMaps(body_rq, object)
+			body, err = h.EncodeMaps(body_rq)
 			if err != "" {
 				response(nil, err)
 				return
@@ -95,7 +95,7 @@ func (h fetchServer) SendOneRequest(method, endpoint, object string, body_rq any
 		response([]map[string]string{{"file": string(resp)}}, "")
 	} else {
 
-		out, err := h.DecodeMaps(resp, object)
+		out, err := h.DecodeMaps(resp)
 		if err != "" {
 			response(nil, err)
 			return
