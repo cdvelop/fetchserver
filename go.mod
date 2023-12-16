@@ -3,6 +3,6 @@ module github.com/cdvelop/fetchserver
 go 1.20
 
 require (
-	github.com/cdvelop/model v0.0.101
+	github.com/cdvelop/model v0.0.102
 	github.com/cdvelop/strings v0.0.9
 )
