@@ -2,7 +2,7 @@ package fetchserver
 
 import "github.com/cdvelop/model"
 
-func AddFetchAdapter(h *model.Handlers) (err string) {
+func AddFetchAdapter(h *model.MainHandler) (err string) {
 	const e = "error fetchserver nil "
 
 	if h.DataConverter == nil {
